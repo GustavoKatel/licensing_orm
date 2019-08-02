@@ -4,6 +4,7 @@ from models import Model, autoproperty, baseproperties
 
 from models.plan import Plan
 from models.subscription import Subscription
+from models.website import Website
 
 @baseproperties
 @autoproperty(name='')
@@ -37,7 +38,8 @@ class Customer(Model):
         returns true if the user has a subscription, false otherwise
         :rtype: boolean
         '''
-        return self.subscription is not None
+        return self.subscription is not None and \
+            isinstance(self.subscription, Subscription)
 
     def subscribe(self, plan_name):
         '''
@@ -56,3 +58,21 @@ class Customer(Model):
         # about 365 days, 5 hours, 48 minutes, and 46 seconds
         renewal_date = datetime.now() + timedelta(days=365.2422)
         self.subscription.renewal_date = renewal_date
+
+    def create_website(self, url):
+        '''
+        creates a website for the user. Checks if the current plan can create more websites
+        :param url: str
+        :rtype Website:
+        '''
+        if not self.has_subscription():
+            raise Exception('Please subscribe to create a website')
+
+        total_websites = Website.count({'customer': self})
+        max_websites = self.subscription.plan.number_websites
+
+        if total_websites >= max_websites:
+            raise Exception('Max websites reached for this plan. Please upgrade')
+
+        website = Website.create(url, self)
+        return website

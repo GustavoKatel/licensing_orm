@@ -74,5 +74,28 @@ class TestCustomer(ModelTestCase):
 
         self.assertEqual(c1.subscription.renewal_date.year, datetime.now().year+1)
 
+    def test_website_create_no_plan(self):
+        c1 = Customer('c1', '12345', 'abc@example.com', None)
+        with self.assertRaisesRegex(Exception, 'Please subscribe .*'):
+            c1.create_website('http://localhost')
+
+    def test_website_create_ok(self):
+        Plan.seed(SEEDS['plans'])
+        p1 = Plan.find_one({'name': 'single'})
+
+        c1 = Customer('c1', '12345', 'abc@example.com', Subscription(datetime.now(), p1))
+        website = c1.create_website('http://localhost')
+        self.assertEqual(website.url, 'http://localhost')
+
+    def test_website_create_max_reached(self):
+        Plan.seed(SEEDS['plans'])
+        p1 = Plan.find_one({'name': 'single'})
+
+        c1 = Customer('c1', '12345', 'abc@example.com', Subscription(datetime.now(), p1))
+        c1.create_website('http://localhost')
+
+        with self.assertRaisesRegex(Exception, 'Max websites reached for this plan.*'):
+            c1.create_website('http://localhost')
+
 if __name__ == '__main__':
     unittest.main()
