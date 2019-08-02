@@ -2,6 +2,7 @@
 from models import Model, autoproperty, baseproperties
 
 from models.plan import Plan
+from models.subscription import Subscription
 
 @baseproperties
 @autoproperty(name='')
@@ -38,4 +39,11 @@ class Customer(Model):
         return self.subscription is not None
 
     def subscribe(self, plan_name):
-        plan = Plan.find({'name': plan_name})
+        plan = Plan.find_one({'name': plan_name})
+        if plan is None:
+            raise Exception('Invalid plan')
+
+        if not self.has_subscription():
+            self.subscription = Subscription.create('today', plan)
+        else:
+            self.subscription.plan = plan
