@@ -19,6 +19,12 @@ class TestCustomer(ModelTestCase):
         with self.assertRaises(ValidatorException):
             Customer('asd', None, 'asd@example.com', None)
 
+    def test_hashed_password(self):
+        c1 = Customer('asd', 'abc', 'asd@example.com', None)
+        self.assertNotEqual(c1.password, 'abc')
+        self.assertEqual(c1.password, Customer.hash_password('abc'))
+        self.assertIsInstance(c1.password, str)
+
     def test_invalid_email(self):
         with self.assertRaises(ValidatorException):
             Customer('c1', '123', 'asd', None)

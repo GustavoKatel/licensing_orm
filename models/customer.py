@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import hashlib
 
 from models import Model, autoproperty, baseproperties
 from models.plan import Plan
@@ -13,6 +14,10 @@ from models.validator.instance_validator import InstanceValidator
 @autoproperty(email='', validators=[InstanceValidator(str), EmailValidator()])
 @autoproperty(subscription=None)
 class Customer(Model):
+    @classmethod
+    def hash_password(cls, password):
+        return hashlib.sha256(password.encode('utf8')).hexdigest()
+
     def __init__(self, name, password, email, subscription):
         '''
         Creates a new Costumer object
@@ -26,6 +31,9 @@ class Customer(Model):
         self.password = password
         self.email = email
         self.subscription = subscription
+
+    def set_password(self, password):
+        self._password = Customer.hash_password(password)
 
     def __eq__(self, other):
         return super().__eq__(other) and \

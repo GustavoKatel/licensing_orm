@@ -47,7 +47,12 @@ def autoproperty(**kwargs):
         for vdt in validators:
             if not vdt.validate(v):
                 raise ValidatorException(v, property=baseName)
-        setattr(obj, innerName, v)
+
+        custom_setter = getattr(obj, 'set_{}'.format(baseName), None)
+        if custom_setter is not None:
+            custom_setter(v)
+        else:
+            setattr(obj, innerName, v)
 
     def _del(obj):
         delattr(obj, innerName)

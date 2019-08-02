@@ -18,6 +18,16 @@ class ModelTest2(Model):
         super().__init__()
         self.price = price
 
+@baseproperties
+@autoproperty(custom=0.0)
+class ModelTest3(Model):
+    def __init__(self, custom):
+        super().__init__()
+        self.custom = custom
+
+    def set_custom(self, value):
+        self._custom = value + 1
+
 class ModelTestCase(unittest.TestCase):
     def setUp(self):
         Model.reset_all_containers()
@@ -36,6 +46,13 @@ class TestModel(ModelTestCase):
 
         properties = model.__properties__
         self.assertEqual(['updated_at', 'created_at', 'id', 'name'], properties)
+
+    def test_custom_setter(self):
+        model = ModelTest3(0)
+        self.assertEqual(model.custom, 1)
+
+        model.custom = 2
+        self.assertEqual(model.custom, 3)
 
     def test_property_cannot_set_id(self):
         model = ModelTest('test')
