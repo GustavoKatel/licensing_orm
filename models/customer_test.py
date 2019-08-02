@@ -3,6 +3,7 @@ from datetime import datetime
 
 from .subscription import Subscription
 from .plan import Plan
+from .website import Website
 from .customer import Customer
 from .seeds.seeds import SEEDS
 
@@ -96,6 +97,21 @@ class TestCustomer(ModelTestCase):
 
         with self.assertRaisesRegex(Exception, 'Max websites reached for this plan.*'):
             c1.create_website('http://localhost')
+
+    def test_website_create_max_reached_ok_after_remove(self):
+        Plan.seed(SEEDS['plans'])
+        p1 = Plan.find_one({'name': 'single'})
+
+        c1 = Customer('c1', '12345', 'abc@example.com', Subscription(datetime.now(), p1))
+        c1.create_website('http://localhost')
+
+        with self.assertRaisesRegex(Exception, 'Max websites reached for this plan.*'):
+            c1.create_website('http://localhost')
+
+        website = Website.find_one({'customer': c1})
+        website.remove()
+
+        c1.create_website('http://localhost:9090')
 
 if __name__ == '__main__':
     unittest.main()
