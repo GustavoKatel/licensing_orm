@@ -1,0 +1,105 @@
+import unittest
+
+from .model import Model
+from .autoproperty import autoproperty
+from .baseproperties import baseproperties
+
+@baseproperties
+@autoproperty(name='')
+class ModelTest(Model):
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+
+@baseproperties
+@autoproperty(price=0.0)
+class ModelTest2(Model):
+    def __init__(self, price):
+        super().__init__()
+        self.price = price
+
+class TestModel(unittest.TestCase):
+    def setUp(self):
+        ModelTest.clear()
+        ModelTest2.clear()
+
+    def test_property(self):
+        model = ModelTest('test')
+        self.assertEqual(model.name, 'test')
+        #pylint: disable=no-member
+        self.assertEqual(model._name, 'test')
+
+        model.name = 'test2'
+        self.assertEqual(model.name, 'test2')
+        #pylint: disable=no-member
+        self.assertEqual(model._name, 'test2')
+
+        properties = model.__properties__
+        self.assertEqual(['updated_at', 'created_at', 'id', 'name'], properties)
+
+    def test_container(self):
+        self.assertEqual(ModelTest.all(), [])
+
+        m1 = ModelTest.create('abc')
+        self.assertEqual(len(ModelTest.all()), 1)
+        self.assertEqual(ModelTest.all()[0].name, m1.name)
+
+        m2 = ModelTest2.create(15.3)
+        self.assertEqual(len(ModelTest2.all()), 1)
+        self.assertEqual(ModelTest2.all()[0].price, m2.price)
+
+    def test_find(self):
+        m1 = ModelTest.create('abc')
+        m2 = ModelTest.create('abc 2')
+        m3 = ModelTest.create('abc')
+
+        ret = ModelTest.find({'name': 'abc'})
+        self.assertEqual(len(ret), 2)
+
+        self.assertEqual(ret[0], m1)
+        self.assertNotEqual(ret[1], m1)
+
+        self.assertEqual(ret[1], m3)
+        self.assertNotEqual(ret[0], m3)
+
+        ret = ModelTest.find({'name': 'abc 2'})
+        self.assertEqual(len(ret), 1)
+        self.assertEqual(ret[0], m2)
+
+    def test_eq(self):
+        m1 = ModelTest('abc')
+        m2 = ModelTest2(15.4)
+        self.assertNotEqual(m1, m2)
+
+    def test_save(self):
+        m1 = ModelTest('abc')
+        ret = ModelTest.find({'name': 'abc'})
+        self.assertEqual(len(ret), 0)
+
+        m1.save()
+        ret = ModelTest.find({'name': 'abc'})
+        self.assertEqual(len(ret), 1)
+
+    def test_update(self):
+        m1 = ModelTest('abc')
+        ret = ModelTest.find({'name': 'abc'})
+        self.assertEqual(len(ret), 0)
+
+        m1.save()
+        ret = ModelTest.find({'name': 'abc'})
+        self.assertEqual(len(ret), 1)
+
+        m1.name = 'test'
+        ret = ModelTest.find({'name': 'abc'})
+        self.assertEqual(len(ret), 1)
+
+        m1.save()
+        ret = ModelTest.find({'name': 'abc'})
+        self.assertEqual(len(ret), 0)
+
+        ret = ModelTest.find({'name': 'test'})
+        self.assertEqual(len(ret), 1)
+
+
+if __name__ == '__main__':
+    unittest.main()
