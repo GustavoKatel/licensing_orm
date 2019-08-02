@@ -100,6 +100,27 @@ class Model(object):
         return results
 
     @classmethod
+    def find_one(cls, query):
+        '''
+        queries stored items for this model. Returns only the first result
+        :param query: dict where keys are properties
+        '''
+        if query == None:
+            query = {}
+
+        ct = cls._get_container()
+        for item in ct:
+            valid = True
+            for key, value in query.items():
+                if not getattr(item, key, None) == value:
+                    valid = False
+
+            if valid:
+                return deepcopy(item)
+
+        return None
+
+    @classmethod
     def save_object(cls, obj):
         '''
         saves an object to this container
@@ -117,3 +138,30 @@ class Model(object):
             ct.append(deepcopy(obj))
 
         cls._set_container(ct)
+
+    @classmethod
+    def _seed_from_list(cls, data):
+        obj = cls.create(*data)
+        return obj
+
+    @classmethod
+    def _seed_from_dict(cls, data):
+        obj = cls.create(**data)
+        return obj
+
+    @classmethod
+    def seed(cls, data):
+        '''
+        seeds the container with data in `data`
+        :param data: list<list|dict>
+        '''
+        results = []
+        for entry in data:
+            if isinstance(entry, dict):
+                results.append(cls._seed_from_dict(entry))
+            elif isinstance(entry, list):
+                results.append(cls._seed_from_list(entry))
+            else:
+                raise Exception('Invalid data type. Required list or dict')
+
+        return results

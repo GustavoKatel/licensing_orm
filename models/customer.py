@@ -1,6 +1,8 @@
 
 from models import Model, autoproperty, baseproperties
 
+from models.plan import Plan
+
 @baseproperties
 @autoproperty(name='')
 @autoproperty(password='')
@@ -27,3 +29,13 @@ class Customer(Model):
             self.password == other.password and \
             self.email == other.email and \
             self.subscription == other.subscription
+
+    def has_subscription(self):
+        '''
+        returns true if the user has a subscription, false otherwise
+        :rtype: boolean
+        '''
+        return self.subscription is not None
+
+    def subscribe(self, plan_name):
+        plan = Plan.find({'name': plan_name})

@@ -66,6 +66,14 @@ class TestModel(unittest.TestCase):
         self.assertEqual(len(ret), 1)
         self.assertEqual(ret[0], m2)
 
+    def test_find_one(self):
+        m1 = ModelTest.create('abc')
+        ModelTest.create('abc 2')
+        ModelTest.create('abc')
+
+        ret = ModelTest.find_one({'name': 'abc'})
+        self.assertEqual(ret, m1)
+
     def test_eq(self):
         m1 = ModelTest('abc')
         m2 = ModelTest2(15.4)
@@ -99,6 +107,17 @@ class TestModel(unittest.TestCase):
 
         ret = ModelTest.find({'name': 'test'})
         self.assertEqual(len(ret), 1)
+
+    def test_seed(self):
+        seed_data = [
+            ['test1'],
+            {'name': 'test2'}
+        ]
+
+        results = ModelTest.seed(seed_data)
+        self.assertEqual(2, len(results))
+        self.assertEqual('test1', results[0].name)
+        self.assertEqual('test2', results[1].name)
 
 
 if __name__ == '__main__':
