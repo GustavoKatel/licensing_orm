@@ -26,10 +26,18 @@ class Model(object):
         '''
         default __repr__ for all models
         '''
-        s = '['
+        def get_prop_value(obj, prop, default):
+            v = getattr(self, prop, None)
+
+            if isinstance(v, Model):
+                return '{} [id={}]'.format(v.__class__.__name__, v.id)
+
+            return v
+
+        s = '{} ['.format(self.__class__.__name__)
         s += ' '.join(
             map(
-                lambda prop: '{}={}'.format(prop, getattr(self, prop, None)),
+                lambda prop: '{}={}'.format(prop, get_prop_value(self, prop, None)),
                 getattr(self, '__properties__', [])
             )
         )
