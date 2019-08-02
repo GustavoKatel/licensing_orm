@@ -27,8 +27,12 @@ class Model(object):
         default __repr__ for all models
         '''
         s = '['
-        for prop in getattr(self, '__properties__', []):
-            s += '{}={}'.format(prop, getattr(self, prop, None))
+        s += ' '.join(
+            map(
+                lambda prop: '{}={}'.format(prop, getattr(self, prop, None)),
+                getattr(self, '__properties__', [])
+            )
+        )
         return s + ']'
 
     def __eq__(self, other):
@@ -47,6 +51,12 @@ class Model(object):
         saves this instance to the container
         '''
         self.__class__.save_object(self)
+
+    def remove(self):
+        '''
+        removes this instance from the container
+        '''
+        self.__class__.remove_object(self)
 
     @staticmethod
     def _get_global_container(cls):
@@ -114,7 +124,7 @@ class Model(object):
         return deepcopy(obj)
 
     @classmethod
-    def find(cls, query):
+    def find(cls, query=None):
         '''
         queries stored items for this model
         :param query: dict where keys are properties
@@ -136,7 +146,7 @@ class Model(object):
         return results
 
     @classmethod
-    def count(cls, query):
+    def count(cls, query=None):
         '''
         returns the number of items matching the query
         :param query: dict where keys are properties
@@ -224,3 +234,12 @@ class Model(object):
                 raise Exception('Invalid data type. Required list or dict')
 
         return results
+
+    @classmethod
+    def remove_object(cls, obj):
+        '''
+        removes an object from this model container
+        '''
+        ct = cls._get_container()
+        ct.remove(obj)
+        cls._set_container(ct)

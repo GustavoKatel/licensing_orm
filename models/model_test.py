@@ -153,6 +153,23 @@ class TestModel(ModelTestCase):
         self.assertEqual('test1', results[0].name)
         self.assertEqual('test2', results[1].name)
 
+    def test_remove(self):
+        m1 = ModelTest.create('abc')
+        ModelTest.create('abc 2')
+        m3 = ModelTest.create('abc')
+
+        ret = ModelTest.count()
+        self.assertEqual(ret, 3)
+
+        m1.remove()
+        ret = ModelTest.count()
+        self.assertEqual(ret, 2)
+        self.assertEqual(ModelTest.find_one({'name': 'abc'}), m3)
+
+        ModelTest.remove_object(m3)
+        ret = ModelTest.count()
+        self.assertEqual(ret, 1)
+        self.assertIsNone(ModelTest.find_one({'name': 'abc'}))
 
 if __name__ == '__main__':
     unittest.main()
