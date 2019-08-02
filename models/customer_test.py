@@ -51,5 +51,17 @@ class TestCustomer(ModelTestCase):
         self.assertTrue(c1.has_subscription())
         self.assertEqual(c1.subscription.plan.name, 'single')
 
+    def test_subscribe_invalid_plan(self):
+        # do not seed, so we can raise an exception
+        # Plan.seed(SEEDS['plans'])
+
+        c1 = Customer('c1', '123456', 'abc@example.com', None)
+        self.assertFalse(c1.has_subscription())
+
+        with self.assertRaisesRegex(Exception, 'Invalid plan'):
+            c1.subscribe('single')
+
+        self.assertFalse(c1.has_subscription())
+
 if __name__ == '__main__':
     unittest.main()
