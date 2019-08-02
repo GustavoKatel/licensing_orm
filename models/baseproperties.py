@@ -9,6 +9,6 @@ def baseproperties(cls):
     - updated_at
     '''
     cls = autoproperty(id=0, hasSet=False)(cls)
-    cls = autoproperty(created_at='')(cls)
-    cls = autoproperty(updated_at='')(cls)
+    cls = autoproperty(created_at=None)(cls)
+    cls = autoproperty(updated_at=None)(cls)
     return cls

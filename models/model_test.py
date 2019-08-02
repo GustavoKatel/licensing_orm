@@ -42,6 +42,24 @@ class TestModel(ModelTestCase):
         with self.assertRaises(Exception):
             model.id = 123
 
+    def test_property_updated_at(self):
+        model = ModelTest('test')
+        model.name = 'test2'
+        self.assertIsNotNone(model.updated_at)
+
+    def test_property_created_at(self):
+        model = ModelTest('test')
+        model.name = 'test2'
+        model.save()
+
+        self.assertIsNotNone(model.created_at)
+        # we have updated
+        self.assertNotEqual(model.created_at, model.updated_at)
+
+        ret = ModelTest.find_one({'name': 'test2'})
+        self.assertEqual(ret.created_at, model.created_at)
+        self.assertEqual(ret.updated_at, model.updated_at)
+
     def test_container(self):
         self.assertEqual(ModelTest.all(), [])
 

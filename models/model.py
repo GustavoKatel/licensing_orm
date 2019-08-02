@@ -1,4 +1,5 @@
 from copy import deepcopy
+from datetime import datetime
 
 from .autoproperty import autoproperty
 
@@ -8,10 +9,18 @@ class Model(object):
     """
     Base model class to be shared in all models
     """
-    def __init__(self, id=None):
+    def __init__(self, created_at=None, updated_at=None, id=None):
         if id is None:
             id = self.__class__.next_sequence()
         self._id = id
+
+        if created_at is None:
+            created_at = datetime.now()
+        self.created_at = created_at
+
+        if updated_at is None:
+            updated_at = created_at
+        self.updated_at = updated_at
 
     def __repr__(self):
         '''
@@ -25,6 +34,13 @@ class Model(object):
     def __eq__(self, other):
         return self.__class__ == other.__class__ and \
             self._id == other._id
+
+    def __setattr__(self, attr, value):
+        super().__setattr__(attr, value)
+
+        if attr in ['created_at', 'updated_at', '_created_at', '_updated_at']:
+            return
+        self.updated_at = datetime.now()
 
     def save(self):
         '''

@@ -1,13 +1,13 @@
 from models import Model, autoproperty, baseproperties
 
 @baseproperties
-@autoproperty(renewal_date='')
+@autoproperty(renewal_date=None)
 @autoproperty(plan=None)
 class Subscription(Model):
     def __init__(self, renewal_date, plan):
         '''
         Creates a new Subscription object
-            :param renewal_date: str
+            :param renewal_date: datetime point in the future
             :param plan: Plan
         '''
         super().__init__()
