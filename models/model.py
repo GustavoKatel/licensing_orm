@@ -132,12 +132,16 @@ class Model(object):
         return deepcopy(obj)
 
     @classmethod
+    def _compare_props_query(cls, v1, v2):
+        return v1 == v2
+
+    @classmethod
     def find(cls, query=None):
         '''
         queries stored items for this model
         :param query: dict where keys are properties
         '''
-        if query == None:
+        if query is None:
             query = {}
 
         ct = cls._get_container()
@@ -145,7 +149,7 @@ class Model(object):
         for item in ct:
             valid = True
             for key, value in query.items():
-                if not getattr(item, key, None) == value:
+                if not cls._compare_props_query(getattr(item, key, None), value):
                     valid = False
 
             if valid:
@@ -160,7 +164,7 @@ class Model(object):
         :param query: dict where keys are properties
         :rtype int:
         '''
-        if query == None:
+        if query is None:
             query = {}
 
         ct = cls._get_container()
@@ -168,7 +172,7 @@ class Model(object):
         for item in ct:
             valid = True
             for key, value in query.items():
-                if not getattr(item, key, None) == value:
+                if not cls._compare_props_query(getattr(item, key, None), value):
                     valid = False
 
             if valid:
@@ -182,14 +186,14 @@ class Model(object):
         queries stored items for this model. Returns only the first result
         :param query: dict where keys are properties
         '''
-        if query == None:
+        if query is None:
             query = {}
 
         ct = cls._get_container()
         for item in ct:
             valid = True
             for key, value in query.items():
-                if not getattr(item, key, None) == value:
+                if not cls._compare_props_query(getattr(item, key, None), value):
                     valid = False
 
             if valid:

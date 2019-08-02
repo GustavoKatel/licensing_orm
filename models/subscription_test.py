@@ -23,5 +23,12 @@ class TestSubscription(ModelTestCase):
         with self.assertRaises(ValidatorException):
             Subscription(None, None)
 
+    def test_expired_renewals(self):
+        s1 = Subscription.create(datetime.now(), Plan('p1', 15.3, 3))
+        Subscription.create(datetime.now()+timedelta(days=1), Plan('p1', 15.3, 3))
+
+        self.assertEqual(Subscription.count(), 2)
+        self.assertEqual([s1], Subscription.get_expired_subscriptions())
+
 if __name__ == '__main__':
     unittest.main()
