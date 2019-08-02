@@ -37,6 +37,11 @@ class TestModel(unittest.TestCase):
         properties = model.__properties__
         self.assertEqual(['updated_at', 'created_at', 'id', 'name'], properties)
 
+    def test_property_cannot_set_id(self):
+        model = ModelTest('test')
+        with self.assertRaises(Exception):
+            model.id = 123
+
     def test_container(self):
         self.assertEqual(ModelTest.all(), [])
 
