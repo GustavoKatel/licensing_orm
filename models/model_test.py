@@ -89,6 +89,17 @@ class TestModel(ModelTestCase):
         self.assertEqual(len(ret), 1)
         self.assertEqual(ret[0], m2)
 
+    def test_count(self):
+        ModelTest.create('abc')
+        ModelTest.create('abc 2')
+        ModelTest.create('abc')
+
+        ret = ModelTest.count({'name': 'abc'})
+        self.assertEqual(ret, 2)
+
+        ret = ModelTest.count({'name': 'abc 2'})
+        self.assertEqual(ret, 1)
+
     def test_find_one(self):
         m1 = ModelTest.create('abc')
         ModelTest.create('abc 2')

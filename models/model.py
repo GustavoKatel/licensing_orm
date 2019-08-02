@@ -136,6 +136,29 @@ class Model(object):
         return results
 
     @classmethod
+    def count(cls, query):
+        '''
+        returns the number of items matching the query
+        :param query: dict where keys are properties
+        :rtype int:
+        '''
+        if query == None:
+            query = {}
+
+        ct = cls._get_container()
+        results = 0
+        for item in ct:
+            valid = True
+            for key, value in query.items():
+                if not getattr(item, key, None) == value:
+                    valid = False
+
+            if valid:
+                results += 1
+
+        return results
+
+    @classmethod
     def find_one(cls, query):
         '''
         queries stored items for this model. Returns only the first result
