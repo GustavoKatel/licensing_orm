@@ -1,15 +1,16 @@
 from datetime import datetime, timedelta
 
 from models import Model, autoproperty, baseproperties
-
 from models.plan import Plan
 from models.subscription import Subscription
 from models.website import Website
+from models.validator.email_validator import EmailValidator
+from models.validator.instance_validator import InstanceValidator
 
 @baseproperties
-@autoproperty(name='')
-@autoproperty(password='')
-@autoproperty(email='')
+@autoproperty(name='', validators=[InstanceValidator(str)])
+@autoproperty(password='', validators=[InstanceValidator(str)])
+@autoproperty(email='', validators=[InstanceValidator(str), EmailValidator()])
 @autoproperty(subscription=None)
 class Customer(Model):
     def __init__(self, name, password, email, subscription):
@@ -50,14 +51,14 @@ class Customer(Model):
         if plan is None:
             raise Exception('Invalid plan')
 
-        if not self.has_subscription():
-            self.subscription = Subscription.create('today', plan)
-        else:
-            self.subscription.plan = plan
-
         # about 365 days, 5 hours, 48 minutes, and 46 seconds
         renewal_date = datetime.now() + timedelta(days=365.2422)
-        self.subscription.renewal_date = renewal_date
+
+        if not self.has_subscription():
+            self.subscription = Subscription.create(renewal_date, plan)
+        else:
+            self.subscription.plan = plan
+            self.subscription.renewal_date = renewal_date
 
     def create_website(self, url):
         '''

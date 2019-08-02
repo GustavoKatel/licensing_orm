@@ -6,13 +6,33 @@ from .plan import Plan
 from .website import Website
 from .customer import Customer
 from .seeds.seeds import SEEDS
+from .validator.validator import ValidatorException
 
 from .model_test import ModelTestCase
 
 class TestCustomer(ModelTestCase):
+    def test_invalid_name(self):
+        with self.assertRaises(ValidatorException):
+            Customer(None, '123', 'asd@example.com', None)
+
+    def test_invalid_password(self):
+        with self.assertRaises(ValidatorException):
+            Customer('asd', None, 'asd@example.com', None)
+
+    def test_invalid_email(self):
+        with self.assertRaises(ValidatorException):
+            Customer('c1', '123', 'asd', None)
+
+        with self.assertRaises(ValidatorException):
+            Customer('c1', '123', None, None)
+
+        c1 = Customer('c1', '123', 'asd@example.com', None)
+        with self.assertRaises(ValidatorException):
+            c1.email = 'asd'
+
     def test_eq(self):
-        s1 = Subscription('1/1/2019', Plan('p1', 15.3, 3))
-        s2 = Subscription('1/1/2019', Plan('p1', 25.3, 4))
+        s1 = Subscription(datetime.now(), Plan('p1', 15.3, 3))
+        s2 = Subscription(datetime.now(), Plan('p1', 25.3, 4))
 
         c1 = Customer('c1', '123456', 'abc@example.com', s1)
         c2 = Customer('c2', '123456', 'abc@example.com', s1)
@@ -28,7 +48,7 @@ class TestCustomer(ModelTestCase):
         c1 = Customer('c1', '123456', 'abc@example.com', None)
         self.assertFalse(c1.has_subscription())
 
-        s1 = Subscription('1/1/2019', Plan('p1', 15.3, 3))
+        s1 = Subscription(datetime.now(), Plan('p1', 15.3, 3))
         c1 = Customer('c1', '123456', 'abc@example.com', s1)
         self.assertTrue(c1.has_subscription())
 
@@ -44,7 +64,7 @@ class TestCustomer(ModelTestCase):
     def test_subscribe_change_plans(self):
         Plan.seed(SEEDS['plans'])
 
-        s1 = Subscription('1/1/2019', Plan('p1', 15.3, 3))
+        s1 = Subscription(datetime.now(), Plan('p1', 15.3, 3))
         c1 = Customer('c1', '123456', 'abc@example.com', s1)
         self.assertTrue(c1.has_subscription())
         self.assertEqual(c1.subscription.plan.name, 'p1')

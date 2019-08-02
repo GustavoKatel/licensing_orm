@@ -1,9 +1,10 @@
 from models import Model, autoproperty, baseproperties
+from models.validator.instance_validator import InstanceValidator
 
 @baseproperties
-@autoproperty(name='')
-@autoproperty(price=0.0)
-@autoproperty(number_websites=0)
+@autoproperty(name='', validators=[InstanceValidator(str)])
+@autoproperty(price=0.0, validators=[InstanceValidator((float, int))])
+@autoproperty(number_websites=0, validators=[InstanceValidator(int)])
 class Plan(Model):
     def __init__(self, name, price, number_websites):
         '''

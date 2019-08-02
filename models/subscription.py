@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from models import Model, autoproperty, baseproperties
+from models.validator.instance_validator import InstanceValidator
 
 @baseproperties
-@autoproperty(renewal_date=None)
+@autoproperty(renewal_date=None, validators=[InstanceValidator(datetime)])
 @autoproperty(plan=None)
 class Subscription(Model):
     def __init__(self, renewal_date, plan):

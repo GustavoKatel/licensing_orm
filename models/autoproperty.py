@@ -1,3 +1,5 @@
+from .validator import ValidatorException
+
 def autoproperty(**kwargs):
     '''
     Automatically creates properties within a model
@@ -21,6 +23,12 @@ def autoproperty(**kwargs):
     baseName = ''
     innerName = '_{}'
     defaultValue = None
+    validators = []
+
+    # gets the first kwarg and assume the rest are args
+    baseName, defaultValue = list(kwargs.items())[0]
+    innerName = innerName.format(baseName)
+    kwargs.pop(baseName)
 
     for key, value in kwargs.items():
         if key == 'hasGet':
@@ -29,15 +37,16 @@ def autoproperty(**kwargs):
             hasSet = value
         elif key == 'hasDel':
             hasDel = value
-        else:
-            baseName = key
-            innerName = innerName.format(key)
-            defaultValue = value
+        elif key == 'validators':
+            validators = value
 
     def _get(obj):
         return getattr(obj, innerName, defaultValue)
 
     def _set(obj, v):
+        for vdt in validators:
+            if not vdt.validate(v):
+                raise ValidatorException(v, property=baseName)
         setattr(obj, innerName, v)
 
     def _del(obj):
