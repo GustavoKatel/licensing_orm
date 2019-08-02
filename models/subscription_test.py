@@ -3,7 +3,9 @@ import unittest
 from .subscription import Subscription
 from .plan import Plan
 
-class TestSubscription(unittest.TestCase):
+from .model_test import ModelTestCase
+
+class TestSubscription(ModelTestCase):
     def test_eq(self):
         s1 = Subscription('1/1/2019', Plan('p1', 15.3, 3))
         s2 = Subscription('1/2/2019', Plan('p1', 15.3, 3))

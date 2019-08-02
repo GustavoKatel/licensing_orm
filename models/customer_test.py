@@ -5,7 +5,9 @@ from .plan import Plan
 from .customer import Customer
 from .seeds.seeds import SEEDS
 
-class TestCustomer(unittest.TestCase):
+from .model_test import ModelTestCase
+
+class TestCustomer(ModelTestCase):
     def test_eq(self):
         s1 = Subscription('1/1/2019', Plan('p1', 15.3, 3))
         s2 = Subscription('1/1/2019', Plan('p1', 25.3, 4))

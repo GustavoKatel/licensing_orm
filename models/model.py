@@ -2,6 +2,8 @@ from copy import deepcopy
 
 from .autoproperty import autoproperty
 
+_global_containers = {}
+
 class Model(object):
     """
     Base model class to be shared in all models
@@ -30,19 +32,37 @@ class Model(object):
         '''
         self.__class__.save_object(self)
 
+    @staticmethod
+    def _get_global_container(cls):
+        '''
+        manages all containers from all models
+        '''
+        return _global_containers.get(cls, [])
+
+    @staticmethod
+    def _set_global_container(cls, ct):
+        '''
+        manages all containers from all models
+        '''
+        _global_containers[cls] = ct
+
+    @staticmethod
+    def reset_all_containers():
+        _global_containers.clear()
+
     @classmethod
     def _get_container(cls):
         '''
         Returns the base storage for this class
         '''
-        return getattr(cls, '_container', [])
+        return cls._get_global_container(cls)
 
     @classmethod
     def _set_container(cls, ct):
         '''
         Updates the base storage for this class
         '''
-        return setattr(cls, '_container', ct)
+        cls._set_global_container(cls, ct)
 
     @classmethod
     def next_sequence(cls):

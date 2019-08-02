@@ -2,7 +2,9 @@ import unittest
 
 from .plan import Plan
 
-class TestPlan(unittest.TestCase):
+from .model_test import ModelTestCase
+
+class TestPlan(ModelTestCase):
     def test_eq(self):
         p1 = Plan('p1', 15.4, 3)
         p2 = Plan('p2', 15.3, 3)

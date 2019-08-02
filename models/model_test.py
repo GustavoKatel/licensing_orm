@@ -18,11 +18,11 @@ class ModelTest2(Model):
         super().__init__()
         self.price = price
 
-class TestModel(unittest.TestCase):
+class ModelTestCase(unittest.TestCase):
     def setUp(self):
-        ModelTest.clear()
-        ModelTest2.clear()
+        Model.reset_all_containers()
 
+class TestModel(ModelTestCase):
     def test_property(self):
         model = ModelTest('test')
         self.assertEqual(model.name, 'test')
