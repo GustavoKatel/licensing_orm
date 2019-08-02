@@ -139,5 +139,30 @@ class TestCustomer(ModelTestCase):
 
         c1.create_website('http://localhost:9090')
 
+    def test_website_create_plus_plan(self):
+        Plan.seed(SEEDS['plans'])
+        p1 = Plan.find_one({'name': 'plus'})
+
+        c1 = Customer('c1', '12345', 'abc@example.com', Subscription(datetime.now(), p1))
+
+        for i in range(3):
+            c1.create_website('http://localhost')
+            total = Website.count({'customer': c1})
+            self.assertEqual(total, i+1)
+
+        with self.assertRaisesRegex(Exception, 'Max websites reached for this plan.*'):
+            c1.create_website('http://localhost')
+
+    def test_website_create_infinite_plan(self):
+        Plan.seed(SEEDS['plans'])
+        p1 = Plan.find_one({'name': 'infinite'})
+
+        c1 = Customer('c1', '12345', 'abc@example.com', Subscription(datetime.now(), p1))
+
+        for i in range(100):
+            c1.create_website('http://localhost')
+            total = Website.count({'customer': c1})
+            self.assertEqual(total, i+1)
+
 if __name__ == '__main__':
     unittest.main()

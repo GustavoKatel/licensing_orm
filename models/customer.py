@@ -80,7 +80,7 @@ class Customer(Model):
         total_websites = Website.count({'customer': self})
         max_websites = self.subscription.plan.number_websites
 
-        if total_websites >= max_websites:
+        if max_websites >= 0 and total_websites >= max_websites:
             raise Exception('Max websites reached for this plan. Please upgrade')
 
         website = Website.create(url, self)
