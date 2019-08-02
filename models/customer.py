@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 
 from models import Model, autoproperty, baseproperties
 
@@ -39,6 +40,10 @@ class Customer(Model):
         return self.subscription is not None
 
     def subscribe(self, plan_name):
+        '''
+        subscribe the user to a plan
+        :param plan_name: str name of the plan
+        '''
         plan = Plan.find_one({'name': plan_name})
         if plan is None:
             raise Exception('Invalid plan')
@@ -47,3 +52,7 @@ class Customer(Model):
             self.subscription = Subscription.create('today', plan)
         else:
             self.subscription.plan = plan
+
+        # about 365 days, 5 hours, 48 minutes, and 46 seconds
+        renewal_date = datetime.now() + timedelta(days=365.2422)
+        self.subscription.renewal_date = renewal_date

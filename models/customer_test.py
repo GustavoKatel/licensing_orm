@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 
 from .subscription import Subscription
 from .plan import Plan
@@ -62,6 +63,16 @@ class TestCustomer(ModelTestCase):
             c1.subscribe('single')
 
         self.assertFalse(c1.has_subscription())
+
+    def test_subscribe_renewal_date(self):
+        Plan.seed(SEEDS['plans'])
+
+        c1 = Customer('c1', '123456', 'abc@example.com', None)
+        c1.subscribe('single')
+        self.assertTrue(c1.has_subscription())
+        self.assertEqual(c1.subscription.plan.name, 'single')
+
+        self.assertEqual(c1.subscription.renewal_date.year, datetime.now().year+1)
 
 if __name__ == '__main__':
     unittest.main()
